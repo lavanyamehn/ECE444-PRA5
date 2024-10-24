@@ -27,8 +27,7 @@ def predict():
 
     predictions = []
     for text in data:
-        print(text)
-        predictions.append(str(loaded_model.predict(vectorizer.transform([text]))))
+        predictions.append(str(loaded_model.predict(vectorizer.transform([text]))[0]))
 
     return jsonify({'prediction': predictions}), 200
 
