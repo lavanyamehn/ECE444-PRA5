@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 import pickle
@@ -14,12 +14,23 @@ vectorizer = None
 with open('count_vectorizer.pkl', 'rb') as vd:
     vectorizer = pickle.load(vd)
 
-### How to use model to predict
-prediction = loaded_model.predict(vectorizer.transform(['This is fake news']))[0]
-
-@application.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET'])
 def index():
-    return prediction
+    return "Fake News Detection API, use /predict endpoint."
+
+@application.route('/predict', methods=['POST'])
+def predict():
+    data = (request.json).get('text', [])
+
+    if not data or not isinstance(data, list):
+        return jsonify({'error': 'Need to provide input text for prediction'}), 400
+
+    predictions = []
+    for text in data:
+        print(text)
+        predictions.append(str(loaded_model.predict(vectorizer.transform([text]))))
+
+    return jsonify({'prediction': predictions}), 200
 
 if __name__ == '__main__':
     application.run()
